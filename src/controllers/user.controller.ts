@@ -103,7 +103,7 @@ export class UserController {
   ): Promise<{id: string; token: string; username: string}> {
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
-    // Set the 'usertype' from the user model
+    // Set the 'username' from the user model
     const username = user.username;
     // convert a User object into a UserProfile object (reduced set of properties)
     const userProfile = this.userService.convertToUserProfile(user);

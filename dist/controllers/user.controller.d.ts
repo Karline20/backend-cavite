@@ -24,10 +24,10 @@ export declare class UserController {
     login(credentials: Credentials): Promise<{
         id: string;
         token: string;
-        usertype: string;
+        username: string;
     }>;
     whoAmI(currentUserProfile: UserProfile): Promise<string>;
     signUp(newUserRequest: NewUserRequest): Promise<User>;
     find(filter?: Filter<User>): Promise<User[]>;
-    findByEventId(usertype: string): Promise<User[]>;
+    findByEventId(username: string): Promise<User[]>;
 }

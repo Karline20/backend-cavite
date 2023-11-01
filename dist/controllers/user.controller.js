@@ -57,13 +57,13 @@ let UserController = exports.UserController = class UserController {
     async login(credentials) {
         // ensure the user exists, and the password is correct
         const user = await this.userService.verifyCredentials(credentials);
-        // Set the 'usertype' from the user model
-        const usertype = user.usertype;
+        // Set the 'username' from the user model
+        const username = user.username;
         // convert a User object into a UserProfile object (reduced set of properties)
         const userProfile = this.userService.convertToUserProfile(user);
         // create a JSON Web Token based on the user profile
         const token = await this.jwtService.generateToken(userProfile);
-        return { id: user.id, token, usertype };
+        return { id: user.id, token, username };
     }
     async whoAmI(currentUserProfile) {
         return currentUserProfile[security_1.securityId];
@@ -77,11 +77,11 @@ let UserController = exports.UserController = class UserController {
     async find(filter) {
         return this.userRepository.find(filter);
     }
-    async findByEventId(usertype) {
+    async findByEventId(username) {
         // Define a filter to find ratings by event ID
         const filter = {
             where: {
-                usertype: usertype,
+                username: username,
             },
         };
         // Retrieve the ratings based on the filter
@@ -104,7 +104,7 @@ tslib_1.__decorate([
                                 token: {
                                     type: 'string',
                                 },
-                                usertype: {
+                                username: {
                                     type: 'string',
                                 },
                                 emailVerified: {
@@ -190,7 +190,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", Promise)
 ], UserController.prototype, "find", null);
 tslib_1.__decorate([
-    (0, rest_1.get)('/getAllUsers/{usertype}'),
+    (0, rest_1.get)('/getAllUsers/{username}'),
     (0, rest_1.response)(200, {
         description: 'Array of all events model instances by event ID',
         content: {
@@ -202,7 +202,7 @@ tslib_1.__decorate([
             },
         },
     }),
-    tslib_1.__param(0, rest_1.param.path.string('usertype')),
+    tslib_1.__param(0, rest_1.param.path.string('username')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", Promise)
