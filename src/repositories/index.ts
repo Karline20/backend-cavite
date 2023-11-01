@@ -1,13 +1,13 @@
-export * from './foods.repository';
-export * from './restaurants.repository';
-export * from './cafe.repository';
-export * from './stores.repository';
-export * from './fastfood.repository';
-export * from './homemadefood.repository';
-export * from './history.repository';
-export * from './tovisit.repository';
-export * from './festival.repository';
-export * from './events.repository';
-export * from './gasstation.repository';
-export * from './govoffices.repository';
-export * from './schools.repository';
+
+export * from './aboutus.repository';
+export * from './addevent.repository';
+export * from './allevents.repository';
+export * from './favorites.repository';
+export * from './profile.repository';
+export * from './ranking.repository';
+export * from './rating.repository';
+export * from './researchers.repository';
+export * from './terms.repository';
+export * from './tutorial.repository';
+export * from './tutorialstatus.repository';
+

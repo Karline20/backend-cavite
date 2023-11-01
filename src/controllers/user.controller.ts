@@ -13,13 +13,15 @@ import {
   UserServiceBindings,
 } from '@loopback/authentication-jwt';
 import {inject} from '@loopback/core';
-import {model, property, repository} from '@loopback/repository';
+import {Filter, model, property, repository} from '@loopback/repository';
 import {
   get,
   getModelSchemaRef,
+  param,
   post,
   requestBody,
-  SchemaObject,
+  response,
+  SchemaObject
 } from '@loopback/rest';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {genSalt, hash} from 'bcryptjs';
@@ -77,9 +79,19 @@ export class UserController {
             schema: {
               type: 'object',
               properties: {
+                id: {
+                  type: 'string',
+                },
                 token: {
                   type: 'string',
                 },
+                usertype: {
+                  type: 'string',
+                },
+                emailVerified: {
+                  type: false,
+                }
+
               },
             },
           },
@@ -89,15 +101,19 @@ export class UserController {
   })
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
-  ): Promise<{token: string}> {
+  ): Promise<{ id: string; token: string; usertype: string, emailVerified: boolean }> {
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
+    // Set the 'usertype' from the user model
+    const usertype = user.usertype;
     // convert a User object into a UserProfile object (reduced set of properties)
     const userProfile = this.userService.convertToUserProfile(user);
-
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
-    return {token};
+
+    const emailVerified = user.emailVerified;
+
+    return { id: user.id, token, usertype, emailVerified };
   }
 
   @authenticate('jwt')
@@ -156,5 +172,113 @@ export class UserController {
     await this.userRepository.userCredentials(savedUser.id).create({password});
 
     return savedUser;
+  }
+
+  @get('/users')
+  @response(200, {
+    description: 'Array of Allevents model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(User, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async find(
+    @param.filter(User) filter?: Filter<User>,
+  ): Promise<User[]> {
+    return this.userRepository.find(filter);
+  }
+
+  @get('/getAllUsers/{usertype}')
+  @response(200, {
+    description: 'Array of all events model instances by event ID',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(User, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findByEventId(
+    @param.path.string('usertype') usertype: string,
+  ): Promise<User[]> {
+    // Define a filter to find ratings by event ID
+    const filter: Filter<User> = {
+      where: {
+        usertype: usertype,
+      },
+    };
+    // Retrieve the ratings based on the filter
+    return this.userRepository.find(filter);
+  }
+
+  // GET endpoint to check if email is verified
+  @get('/users/check-email-verified/{id}')
+  @response(200, {
+    description: 'Check if email is verified for a user',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            emailVerified: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+  })
+  async checkEmailVerified(
+    @param.path.string('id') id: string,
+  ): Promise<{ emailVerified: boolean }> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return { emailVerified: user.emailVerified ?? false };
+  }
+
+  // POST endpoint to update emailVerified value
+  @post('/users/update-email-verified/{id}')
+  @response(200, {
+    description: 'Updated user with emailVerified status',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(User),
+      },
+    },
+  })
+  async updateEmailVerified(
+    @param.path.string('id') id: string,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              emailVerified: {
+                type: 'boolean',
+              },
+            },
+          },
+        },
+      },
+    })
+    updateData: { emailVerified: boolean },
+  ): Promise<User> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    user.emailVerified = updateData.emailVerified;
+    await this.userRepository.update(user);
+    return user;
   }
 }

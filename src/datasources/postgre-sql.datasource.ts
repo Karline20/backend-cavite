@@ -4,12 +4,12 @@ import {juggler} from '@loopback/repository';
 const config = {
   name: 'postgreSQL',
   connector: 'postgresql',
-  url: '',
-  host: 'localhost',
+  url: 'postgresql://legaspidevelopment:J9KcjwpFUKSw9APLQRKazw@sable-penguin-6982.8nk.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full',
+  host: '',
   port: 5432,
-  user: 'postgres',
-  password: 'Karline082020',
-  database: 'caviteDB'
+  user: 'legaspidevelopment',
+  password: 'J9KcjwpFUKSw9APLQRKazw',
+  database: 'defaultdb'
 };
 
 // Observe application's life cycle to disconnect the datasource when
