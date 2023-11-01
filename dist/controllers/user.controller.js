@@ -78,6 +78,9 @@ let UserController = exports.UserController = class UserController {
         return this.userRepository.find(filter);
     }
     async findByEventId(username) {
+        if (!username) {
+            throw new rest_1.HttpErrors.BadRequest('Username parameter is required');
+        }
         // Define a filter to find ratings by event ID
         const filter = {
             where: {

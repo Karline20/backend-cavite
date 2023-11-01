@@ -17,6 +17,7 @@ import {Filter, model, property, repository} from '@loopback/repository';
 import {
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   post,
   requestBody,
@@ -202,17 +203,23 @@ export class UserController {
     },
   })
   async findByEventId(
-    @param.path.string('username') username: string,
+    @param.path.string('username') username: string, // Make the parameter required
   ): Promise<User[]> {
+    if (!username) {
+      throw new HttpErrors.BadRequest('Username parameter is required');
+    }
+
     // Define a filter to find ratings by event ID
     const filter: Filter<User> = {
       where: {
         username: username,
       },
     };
+
     // Retrieve the ratings based on the filter
     return this.userRepository.find(filter);
   }
+
 
   // GET endpoint to check if email is verified
   // @get('/users/check-email-verified/{id}')
