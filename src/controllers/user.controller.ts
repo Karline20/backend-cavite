@@ -101,11 +101,11 @@ export class UserController {
   })
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
-  ): Promise<{id: string; token: string; username: string}> {
+  ): Promise<{id: string; token: string; username: string, emailVerified: boolean}> {
     // Ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
 
-    if (!user || !user.username) {
+    if (!user || !user.username || !user.emailVerified) {
       throw new HttpErrors.Unauthorized('Invalid user or missing username');
     }
     // Set the 'username' from the user model
@@ -115,7 +115,9 @@ export class UserController {
     // Create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
-    return {id: user.id, token, username};
+    const emailVerified = user.emailVerified;
+
+    return {id: user.id, token, username, emailVerified};
   }
 
 

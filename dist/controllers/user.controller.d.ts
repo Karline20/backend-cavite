@@ -25,6 +25,7 @@ export declare class UserController {
         id: string;
         token: string;
         username: string;
+        emailVerified: boolean;
     }>;
     whoAmI(currentUserProfile: UserProfile): Promise<string>;
     signUp(newUserRequest: NewUserRequest): Promise<User>;
