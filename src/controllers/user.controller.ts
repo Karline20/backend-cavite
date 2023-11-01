@@ -91,7 +91,7 @@ export class UserController {
                 },
                 emailVerified: {
                   type: 'boolean',
-                }
+                },
               },
             },
           },
@@ -102,17 +102,24 @@ export class UserController {
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{id: string; token: string; username: string}> {
-    // ensure the user exists, and the password is correct
+    // Ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
+
+    if (!user || !user.username) {
+      throw new HttpErrors.Unauthorized('Invalid user or missing username');
+    }
+
     // Set the 'username' from the user model
     const username = user.username;
-    // convert a User object into a UserProfile object (reduced set of properties)
+
+    // Convert a User object into a UserProfile object (reduced set of properties)
     const userProfile = this.userService.convertToUserProfile(user);
-    // create a JSON Web Token based on the user profile
+    // Create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
     return {id: user.id, token, username};
   }
+
 
   @authenticate('jwt')
   @get('/whoAmI', {
