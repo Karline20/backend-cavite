@@ -55,15 +55,18 @@ let UserController = exports.UserController = class UserController {
         this.userRepository = userRepository;
     }
     async login(credentials) {
-        // ensure the user exists, and the password is correct
+        // Ensure the user exists, and the password is correct
         const user = await this.userService.verifyCredentials(credentials);
+        if (!user || !user.usertype) {
+            throw new rest_1.HttpErrors.Unauthorized('Invalid user or missing usertype');
+        }
         // Set the 'username' from the user model
-        const username = user.username;
-        // convert a User object into a UserProfile object (reduced set of properties)
+        const usertype = user.usertype;
+        // Convert a User object into a UserProfile object (reduced set of properties)
         const userProfile = this.userService.convertToUserProfile(user);
-        // create a JSON Web Token based on the user profile
+        // Create a JSON Web Token based on the user profile
         const token = await this.jwtService.generateToken(userProfile);
-        return { id: user.id, token, username };
+        return { id: user.id, token, usertype };
     }
     async whoAmI(currentUserProfile) {
         return currentUserProfile[security_1.securityId];
@@ -77,14 +80,14 @@ let UserController = exports.UserController = class UserController {
     async find(filter) {
         return this.userRepository.find(filter);
     }
-    async findByEventId(username) {
-        if (!username) {
-            throw new rest_1.HttpErrors.BadRequest('Username parameter is required');
+    async findByEventId(usertype) {
+        if (!usertype) {
+            throw new rest_1.HttpErrors.BadRequest('Usertype parameter is required');
         }
         // Define a filter to find ratings by event ID
         const filter = {
             where: {
-                username: username,
+                usertype: usertype,
             },
         };
         // Retrieve the ratings based on the filter
@@ -107,12 +110,12 @@ tslib_1.__decorate([
                                 token: {
                                     type: 'string',
                                 },
-                                username: {
+                                usertype: {
                                     type: 'string',
                                 },
                                 emailVerified: {
                                     type: 'boolean',
-                                }
+                                },
                             },
                         },
                     },
@@ -193,7 +196,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", Promise)
 ], UserController.prototype, "find", null);
 tslib_1.__decorate([
-    (0, rest_1.get)('/getAllUsers/{username}'),
+    (0, rest_1.get)('/getAllUsers/{usertype}'),
     (0, rest_1.response)(200, {
         description: 'Array of all events model instances by event ID',
         content: {
@@ -205,7 +208,7 @@ tslib_1.__decorate([
             },
         },
     }),
-    tslib_1.__param(0, rest_1.param.path.string('username')),
+    tslib_1.__param(0, rest_1.param.path.string('usertype')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", Promise)

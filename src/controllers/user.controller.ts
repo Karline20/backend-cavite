@@ -86,7 +86,7 @@ export class UserController {
                 token: {
                   type: 'string',
                 },
-                username: {
+                usertype: {
                   type: 'string',
                 },
                 emailVerified: {
@@ -101,23 +101,23 @@ export class UserController {
   })
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
-  ): Promise<{id: string; token: string; username: string}> {
+  ): Promise<{id: string; token: string; usertype: string}> {
     // Ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
 
-    if (!user || !user.username) {
-      throw new HttpErrors.Unauthorized('Invalid user or missing username');
+    if (!user || !user.usertype) {
+      throw new HttpErrors.Unauthorized('Invalid user or missing usertype');
     }
 
     // Set the 'username' from the user model
-    const username = user.username;
+    const usertype = user.usertype;
 
     // Convert a User object into a UserProfile object (reduced set of properties)
     const userProfile = this.userService.convertToUserProfile(user);
     // Create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
-    return {id: user.id, token, username};
+    return {id: user.id, token, usertype};
   }
 
 
@@ -197,7 +197,7 @@ export class UserController {
     return this.userRepository.find(filter);
   }
 
-  @get('/getAllUsers/{username}')
+  @get('/getAllUsers/{usertype}')
   @response(200, {
     description: 'Array of all events model instances by event ID',
     content: {
@@ -210,16 +210,16 @@ export class UserController {
     },
   })
   async findByEventId(
-    @param.path.string('username') username: string, // Make the parameter required
+    @param.path.string('usertype') usertype: string, // Make the parameter required
   ): Promise<User[]> {
-    if (!username) {
-      throw new HttpErrors.BadRequest('Username parameter is required');
+    if (!usertype) {
+      throw new HttpErrors.BadRequest('Usertype parameter is required');
     }
 
     // Define a filter to find ratings by event ID
     const filter: Filter<User> = {
       where: {
-        username: username,
+        usertype: usertype,
       },
     };
 
