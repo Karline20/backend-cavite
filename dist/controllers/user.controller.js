@@ -63,8 +63,7 @@ let UserController = exports.UserController = class UserController {
         const userProfile = this.userService.convertToUserProfile(user);
         // create a JSON Web Token based on the user profile
         const token = await this.jwtService.generateToken(userProfile);
-        const emailVerified = user.emailVerified;
-        return { id: user.id, token, usertype, emailVerified };
+        return { id: user.id, token, usertype };
     }
     async whoAmI(currentUserProfile) {
         return currentUserProfile[security_1.securityId];
@@ -88,25 +87,6 @@ let UserController = exports.UserController = class UserController {
         // Retrieve the ratings based on the filter
         return this.userRepository.find(filter);
     }
-    // GET endpoint to check if email is verified
-    async checkEmailVerified(id) {
-        var _a;
-        const user = await this.userRepository.findById(id);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        return { emailVerified: (_a = user.emailVerified) !== null && _a !== void 0 ? _a : false };
-    }
-    // POST endpoint to update emailVerified value
-    async updateEmailVerified(id, updateData) {
-        const user = await this.userRepository.findById(id);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        user.emailVerified = updateData.emailVerified;
-        await this.userRepository.update(user);
-        return user;
-    }
 };
 tslib_1.__decorate([
     (0, rest_1.post)('/users/login', {
@@ -128,7 +108,7 @@ tslib_1.__decorate([
                                     type: 'string',
                                 },
                                 emailVerified: {
-                                    type: 'string',
+                                    type: 'boolean',
                                 }
                             },
                         },
@@ -227,57 +207,6 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", Promise)
 ], UserController.prototype, "findByEventId", null);
-tslib_1.__decorate([
-    (0, rest_1.get)('/users/check-email-verified/{id}'),
-    (0, rest_1.response)(200, {
-        description: 'Check if email is verified for a user',
-        content: {
-            'application/json': {
-                schema: {
-                    type: 'object',
-                    properties: {
-                        emailVerified: {
-                            type: 'string',
-                        },
-                    },
-                },
-            },
-        },
-    }),
-    tslib_1.__param(0, rest_1.param.path.string('id')),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", Promise)
-], UserController.prototype, "checkEmailVerified", null);
-tslib_1.__decorate([
-    (0, rest_1.post)('/users/update-email-verified/{id}'),
-    (0, rest_1.response)(200, {
-        description: 'Updated user with emailVerified status',
-        content: {
-            'application/json': {
-                schema: (0, rest_1.getModelSchemaRef)(authentication_jwt_1.User),
-            },
-        },
-    }),
-    tslib_1.__param(0, rest_1.param.path.string('id')),
-    tslib_1.__param(1, (0, rest_1.requestBody)({
-        content: {
-            'application/json': {
-                schema: {
-                    type: 'object',
-                    properties: {
-                        emailVerified: {
-                            type: 'boolean',
-                        },
-                    },
-                },
-            },
-        },
-    })),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [String, Object]),
-    tslib_1.__metadata("design:returntype", Promise)
-], UserController.prototype, "updateEmailVerified", null);
 exports.UserController = UserController = tslib_1.__decorate([
     tslib_1.__param(0, (0, core_1.inject)(authentication_jwt_1.TokenServiceBindings.TOKEN_SERVICE)),
     tslib_1.__param(1, (0, core_1.inject)(authentication_jwt_1.UserServiceBindings.USER_SERVICE)),

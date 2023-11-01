@@ -25,16 +25,9 @@ export declare class UserController {
         id: string;
         token: string;
         usertype: string;
-        emailVerified: string;
     }>;
     whoAmI(currentUserProfile: UserProfile): Promise<string>;
     signUp(newUserRequest: NewUserRequest): Promise<User>;
     find(filter?: Filter<User>): Promise<User[]>;
     findByEventId(usertype: string): Promise<User[]>;
-    checkEmailVerified(id: string): Promise<{
-        emailVerified: string;
-    }>;
-    updateEmailVerified(id: string, updateData: {
-        emailVerified: string;
-    }): Promise<User>;
 }

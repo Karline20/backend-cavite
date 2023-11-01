@@ -91,7 +91,6 @@ export class UserController {
                 emailVerified: {
                   type: 'boolean',
                 }
-
               },
             },
           },
@@ -101,7 +100,7 @@ export class UserController {
   })
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
-  ): Promise<{id: string; token: string; usertype: string, emailVerified: boolean}> {
+  ): Promise<{id: string; token: string; usertype: string}> {
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
     // Set the 'usertype' from the user model
@@ -111,9 +110,7 @@ export class UserController {
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
-    const emailVerified = user.emailVerified;
-
-    return {id: user.id, token, usertype, emailVerified};
+    return {id: user.id, token, usertype};
   }
 
   @authenticate('jwt')
@@ -218,67 +215,67 @@ export class UserController {
   }
 
   // GET endpoint to check if email is verified
-  @get('/users/check-email-verified/{id}')
-  @response(200, {
-    description: 'Check if email is verified for a user',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'object',
-          properties: {
-            emailVerified: {
-              type: 'boolean',
-            },
-          },
-        },
-      },
-    },
-  })
-  async checkEmailVerified(
-    @param.path.string('id') id: string,
-  ): Promise<{emailVerified: boolean}> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new Error('User not found');
-    }
-    return {emailVerified: user.emailVerified ?? false};
-  }
+  // @get('/users/check-email-verified/{id}')
+  // @response(200, {
+  //   description: 'Check if email is verified for a user',
+  //   content: {
+  //     'application/json': {
+  //       schema: {
+  //         type: 'object',
+  //         properties: {
+  //           emailVerified: {
+  //             type: 'boolean',
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // })
+  // async checkEmailVerified(
+  //   @param.path.string('id') id: string,
+  // ): Promise<{emailVerified: boolean}> {
+  //   const user = await this.userRepository.findById(id);
+  //   if (!user) {
+  //     throw new Error('User not found');
+  //   }
+  //   return {emailVerified: user.emailVerified ?? false};
+  // }
 
   // POST endpoint to update emailVerified value
-  @post('/users/update-email-verified/{id}')
-  @response(200, {
-    description: 'Updated user with emailVerified status',
-    content: {
-      'application/json': {
-        schema: getModelSchemaRef(User),
-      },
-    },
-  })
-  async updateEmailVerified(
-    @param.path.string('id') id: string,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              emailVerified: {
-                type: 'boolean',
-              },
-            },
-          },
-        },
-      },
-    })
-    updateData: {emailVerified: boolean},
-  ): Promise<User> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new Error('User not found');
-    }
+  // @post('/users/update-email-verified/{id}')
+  // @response(200, {
+  //   description: 'Updated user with emailVerified status',
+  //   content: {
+  //     'application/json': {
+  //       schema: getModelSchemaRef(User),
+  //     },
+  //   },
+  // })
+  // async updateEmailVerified(
+  //   @param.path.string('id') id: string,
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: {
+  //           type: 'object',
+  //           properties: {
+  //             emailVerified: {
+  //               type: 'boolean',
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   })
+  //   updateData: {emailVerified: boolean},
+  // ): Promise<User> {
+  //   const user = await this.userRepository.findById(id);
+  //   if (!user) {
+  //     throw new Error('User not found');
+  //   }
 
-    user.emailVerified = updateData.emailVerified;
-    await this.userRepository.update(user);
-    return user;
-  }
+  //   user.emailVerified = updateData.emailVerified;
+  //   await this.userRepository.update(user);
+  //   return user;
+  // }
 }
