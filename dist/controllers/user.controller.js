@@ -128,7 +128,7 @@ tslib_1.__decorate([
                                     type: 'string',
                                 },
                                 emailVerified: {
-                                    type: false,
+                                    type: 'string',
                                 }
                             },
                         },
@@ -237,7 +237,7 @@ tslib_1.__decorate([
                     type: 'object',
                     properties: {
                         emailVerified: {
-                            type: 'boolean',
+                            type: 'string',
                         },
                     },
                 },

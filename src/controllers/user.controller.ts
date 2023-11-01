@@ -89,7 +89,7 @@ export class UserController {
                   type: 'string',
                 },
                 emailVerified: {
-                  type: false,
+                  type: 'boolean',
                 }
 
               },
@@ -101,7 +101,7 @@ export class UserController {
   })
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
-  ): Promise<{ id: string; token: string; usertype: string, emailVerified: boolean }> {
+  ): Promise<{id: string; token: string; usertype: string, emailVerified: boolean}> {
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
     // Set the 'usertype' from the user model
@@ -113,7 +113,7 @@ export class UserController {
 
     const emailVerified = user.emailVerified;
 
-    return { id: user.id, token, usertype, emailVerified };
+    return {id: user.id, token, usertype, emailVerified};
   }
 
   @authenticate('jwt')
@@ -236,12 +236,12 @@ export class UserController {
   })
   async checkEmailVerified(
     @param.path.string('id') id: string,
-  ): Promise<{ emailVerified: boolean }> {
+  ): Promise<{emailVerified: boolean}> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new Error('User not found');
     }
-    return { emailVerified: user.emailVerified ?? false };
+    return {emailVerified: user.emailVerified ?? false};
   }
 
   // POST endpoint to update emailVerified value
@@ -270,7 +270,7 @@ export class UserController {
         },
       },
     })
-    updateData: { emailVerified: boolean },
+    updateData: {emailVerified: boolean},
   ): Promise<User> {
     const user = await this.userRepository.findById(id);
     if (!user) {
