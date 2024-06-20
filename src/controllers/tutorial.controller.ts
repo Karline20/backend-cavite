@@ -7,6 +7,7 @@ import {
   getModelSchemaRef,
   param,
   post,
+  put,
   requestBody,
   response
 } from '@loopback/rest';
@@ -56,5 +57,23 @@ export class TutorialController {
     @param.filter(Tutorial) filter?: Filter<Tutorial>,
   ): Promise<Tutorial[]> {
     return this.tutorialRepository.find(filter);
+  }
+
+  @put('/tutorial/{id}')
+  @response(204, {
+    description: 'Tutorial PUT success',
+  })
+  async updateById(
+    @param.path.string('id') id: string, // Assuming 'id' is a string
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Tutorial, {partial: true}),
+        },
+      },
+    })
+    tutorial: Tutorial,
+  ): Promise<void> {
+    await this.tutorialRepository.updateById(id, tutorial);
   }
 }

@@ -21,6 +21,8 @@ export declare class UserController {
     user: UserProfile;
     protected userRepository: UserRepository;
     constructor(jwtService: TokenService, userService: MyUserService, user: UserProfile, userRepository: UserRepository);
+    deleteUserById(id: string): Promise<void>;
+    deleteUsersById(ids: string[]): Promise<void>;
     login(credentials: Credentials): Promise<{
         id: string;
         token: string;

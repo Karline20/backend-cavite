@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,8 @@ import {AddeventRepository} from '../repositories';
 export class AddeventController {
   constructor(
     @repository(AddeventRepository)
-    public addeventRepository : AddeventRepository,
-  ) {}
+    public addeventRepository: AddeventRepository,
+  ) { }
 
   @post('/addevents')
   @response(200, {
@@ -58,6 +58,31 @@ export class AddeventController {
     return this.addeventRepository.count(where);
   }
 
+  // @get('/addevents')
+  // @response(200, {
+  //   description: 'Array of Addevent model instances',
+  //   content: {
+  //     'application/json': {
+  //       schema: {
+  //         type: 'array',
+  //         items: getModelSchemaRef(Addevent, {includeRelations: true}),
+  //       },
+  //     },
+  //   },
+  // })
+  // async find(
+  //   @param.filter(Addevent) filter?: Filter<Addevent>,
+  // ): Promise<Addevent[]> {
+
+  //   const orderFilter: Filter<Addevent> = {
+  //     order: ['name ASC'],
+  //   };
+
+  //   const mergeFilter = {...filter, ...orderFilter};
+
+  //   return this.addeventRepository.find(mergeFilter);
+  // }
+
   @get('/addevents')
   @response(200, {
     description: 'Array of Addevent model instances',
@@ -73,7 +98,43 @@ export class AddeventController {
   async find(
     @param.filter(Addevent) filter?: Filter<Addevent>,
   ): Promise<Addevent[]> {
-    return this.addeventRepository.find(filter);
+    // Define the order you want to sort by
+    const customOrder = [
+      'Cavite City Hymn',
+      'Church',
+      'History',
+      'Events',
+      'Places To visit',
+      'Foods',
+      'Emergency Care & Contacts',
+      'Schools',
+      'Government offices',
+      'Hotel & Resorts',
+      'Gas Station',
+    ];
+
+    // Fetch all addevents
+    const addevents = await this.addeventRepository.find(filter);
+
+    // Sort the addevents according to the custom order
+    addevents.sort((a, b) => {
+      const nameA = a.name || '';
+      const nameB = b.name || '';
+
+      const indexA = customOrder.indexOf(nameA);
+      const indexB = customOrder.indexOf(nameB);
+      if (indexA !== -1 && indexB !== -1) {
+        // If the name is not in the custom order, push it to the end
+        return indexA - indexB;
+      }
+
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      return nameA.localeCompare(nameB);
+    });
+
+    return addevents;
   }
 
   @patch('/addevents')

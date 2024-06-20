@@ -15,6 +15,7 @@ import {
 import {inject} from '@loopback/core';
 import {Filter, model, property, repository} from '@loopback/repository';
 import {
+  del,
   get,
   getModelSchemaRef,
   HttpErrors,
@@ -70,6 +71,60 @@ export class UserController {
     public user: UserProfile,
     @repository(UserRepository) protected userRepository: UserRepository,
   ) { }
+
+  @get('/users/{id}', {
+    responses: {
+      '204': {
+        description: 'User DELETE success',
+      },
+    },
+  })
+  async deleteUserById(
+    @param.path.string('id') id: string,
+  ): Promise<void> {
+    // Check if the user exists
+    const userExists = await this.userRepository.exists(id);
+    if (!userExists) {
+      throw new HttpErrors.NotFound(`User with id ${id} not found.`);
+    }
+
+    // Delete the user
+    await this.userRepository.deleteById(id);
+  }
+
+  @del('/users', {
+    responses: {
+      '204': {
+        description: 'Users DELETE success',
+      },
+    },
+  })
+  async deleteUsersById(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    })
+    ids: string[],
+  ): Promise<void> {
+    for (const id of ids) {
+      // Check if the user exists
+      const userExists = await this.userRepository.exists(id);
+      if (!userExists) {
+        throw new HttpErrors.NotFound(`User with id ${id} not found.`);
+      }
+
+      // Delete the user
+      await this.userRepository.deleteById(id);
+    }
+  }
 
   @post('/users/login', {
     responses: {

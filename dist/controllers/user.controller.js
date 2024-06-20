@@ -54,6 +54,26 @@ let UserController = exports.UserController = class UserController {
         this.user = user;
         this.userRepository = userRepository;
     }
+    async deleteUserById(id) {
+        // Check if the user exists
+        const userExists = await this.userRepository.exists(id);
+        if (!userExists) {
+            throw new rest_1.HttpErrors.NotFound(`User with id ${id} not found.`);
+        }
+        // Delete the user
+        await this.userRepository.deleteById(id);
+    }
+    async deleteUsersById(ids) {
+        for (const id of ids) {
+            // Check if the user exists
+            const userExists = await this.userRepository.exists(id);
+            if (!userExists) {
+                throw new rest_1.HttpErrors.NotFound(`User with id ${id} not found.`);
+            }
+            // Delete the user
+            await this.userRepository.deleteById(id);
+        }
+    }
     async login(credentials) {
         // Ensure the user exists, and the password is correct
         const user = await this.userService.verifyCredentials(credentials);
@@ -95,6 +115,43 @@ let UserController = exports.UserController = class UserController {
         return this.userRepository.find(filter);
     }
 };
+tslib_1.__decorate([
+    (0, rest_1.get)('/users/{id}', {
+        responses: {
+            '204': {
+                description: 'User DELETE success',
+            },
+        },
+    }),
+    tslib_1.__param(0, rest_1.param.path.string('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", Promise)
+], UserController.prototype, "deleteUserById", null);
+tslib_1.__decorate([
+    (0, rest_1.del)('/users', {
+        responses: {
+            '204': {
+                description: 'Users DELETE success',
+            },
+        },
+    }),
+    tslib_1.__param(0, (0, rest_1.requestBody)({
+        content: {
+            'application/json': {
+                schema: {
+                    type: 'array',
+                    items: {
+                        type: 'string',
+                    },
+                },
+            },
+        },
+    })),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [Array]),
+    tslib_1.__metadata("design:returntype", Promise)
+], UserController.prototype, "deleteUsersById", null);
 tslib_1.__decorate([
     (0, rest_1.post)('/users/login', {
         responses: {
