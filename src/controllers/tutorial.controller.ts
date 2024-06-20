@@ -41,24 +41,6 @@ export class TutorialController {
     return this.tutorialRepository.create(tutorial);
   }
 
-  @get('/tutorial')
-  @response(200, {
-    description: 'Array of Rating model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Tutorial, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async find(
-    @param.filter(Tutorial) filter?: Filter<Tutorial>,
-  ): Promise<Tutorial[]> {
-    return this.tutorialRepository.find(filter);
-  }
-
   @put('/tutorial/{id}')
   @response(204, {
     description: 'Tutorial PUT success',
@@ -75,5 +57,46 @@ export class TutorialController {
     tutorial: Tutorial,
   ): Promise<void> {
     await this.tutorialRepository.updateById(id, tutorial);
+  }
+
+  @get('/tutorial')
+  @response(200, {
+    description: 'Array of Tutorial model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Tutorial, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async find(
+    @param.filter(Tutorial) filter?: Filter<Tutorial>,
+  ): Promise<Tutorial[]> {
+    return this.tutorialRepository.find(filter);
+  }
+
+  @get('/tutorial/search')
+  @response(200, {
+    description: 'Array of Tutorial model instances matching the search criteria',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Tutorial, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async searchTutorial(
+    @param.query.string('q') searchQuery: string
+  ): Promise<Tutorial[]> {
+    const filter: Filter<Tutorial> = {
+      where: {
+        tutorial: {ilike: `%${searchQuery}%`}
+      },
+    };
+    return this.tutorialRepository.find(filter);
   }
 }

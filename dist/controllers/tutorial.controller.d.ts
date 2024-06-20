@@ -5,7 +5,8 @@ export declare class TutorialController {
     tutorialRepository: TutorialRepository;
     constructor(tutorialRepository: TutorialRepository);
     create(tutorial: Omit<Tutorial, 'y'>): Promise<Tutorial>;
-    find(filter?: Filter<Tutorial>): Promise<Tutorial[]>;
     updateById(id: string, // Assuming 'id' is a string
     tutorial: Tutorial): Promise<void>;
+    find(filter?: Filter<Tutorial>): Promise<Tutorial[]>;
+    searchTutorial(searchQuery: string): Promise<Tutorial[]>;
 }
