@@ -6,6 +6,7 @@ import {
   get,
   getModelSchemaRef,
   param,
+  patch,
   post,
   put,
   requestBody,
@@ -41,11 +42,29 @@ export class TutorialController {
     return this.tutorialRepository.create(tutorial);
   }
 
+  @patch('/tutorial/{id}')
+  @response(204, {
+    description: 'Tutorial PATCH success',
+  })
+  async updateById(
+    @param.path.string('id') id: string,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Tutorial, {partial: true}),
+        },
+      },
+    })
+    tutorial: Tutorial,
+  ): Promise<void> {
+    await this.tutorialRepository.updateById(id, tutorial);
+  }
+
   @put('/tutorial/{id}')
   @response(204, {
     description: 'Tutorial PUT success',
   })
-  async updateById(
+  async replaceById(
     @param.path.string('id') id: string, // Assuming 'id' is a string
     @requestBody({
       content: {
@@ -74,8 +93,11 @@ export class TutorialController {
   async find(
     @param.filter(Tutorial) filter?: Filter<Tutorial>,
   ): Promise<Tutorial[]> {
+    filter = filter ?? {};
+    filter.order = ['tutorial ASC'];
     return this.tutorialRepository.find(filter);
   }
+
 
   @get('/tutorial/search')
   @response(200, {

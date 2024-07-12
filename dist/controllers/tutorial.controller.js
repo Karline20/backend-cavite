@@ -16,7 +16,12 @@ let TutorialController = exports.TutorialController = class TutorialController {
     async updateById(id, tutorial) {
         await this.tutorialRepository.updateById(id, tutorial);
     }
+    async replaceById(id, tutorial) {
+        await this.tutorialRepository.updateById(id, tutorial);
+    }
     async find(filter) {
+        filter = filter !== null && filter !== void 0 ? filter : {};
+        filter.order = ['tutorial ASC'];
         return this.tutorialRepository.find(filter);
     }
     async searchTutorial(searchQuery) {
@@ -49,6 +54,23 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", Promise)
 ], TutorialController.prototype, "create", null);
 tslib_1.__decorate([
+    (0, rest_1.patch)('/tutorial/{id}'),
+    (0, rest_1.response)(204, {
+        description: 'Tutorial PATCH success',
+    }),
+    tslib_1.__param(0, rest_1.param.path.string('id')),
+    tslib_1.__param(1, (0, rest_1.requestBody)({
+        content: {
+            'application/json': {
+                schema: (0, rest_1.getModelSchemaRef)(models_1.Tutorial, { partial: true }),
+            },
+        },
+    })),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String, models_1.Tutorial]),
+    tslib_1.__metadata("design:returntype", Promise)
+], TutorialController.prototype, "updateById", null);
+tslib_1.__decorate([
     (0, rest_1.put)('/tutorial/{id}'),
     (0, rest_1.response)(204, {
         description: 'Tutorial PUT success',
@@ -64,7 +86,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String, models_1.Tutorial]),
     tslib_1.__metadata("design:returntype", Promise)
-], TutorialController.prototype, "updateById", null);
+], TutorialController.prototype, "replaceById", null);
 tslib_1.__decorate([
     (0, rest_1.get)('/tutorial'),
     (0, rest_1.response)(200, {
