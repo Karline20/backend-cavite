@@ -74,6 +74,8 @@ export class ResearcherController {
   async find(
     @param.filter(Researcher) filter?: Filter<Researcher>,
   ): Promise<Researcher[]> {
+    filter = filter ?? {};
+    filter.order = ['name ASC']
     return this.researcherRepository.find(filter);
   }
 
