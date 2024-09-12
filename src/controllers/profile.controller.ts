@@ -79,8 +79,13 @@ export class ProfileController {
   }
 
   @patch('/profile/{id}')
-  @response(204, {
+  @response(200, {
     description: 'Profile PATCH success',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Profile, {partial: true}),
+      },
+    },
   })
   async updateById(
     @param.path.string('id') id: string,
@@ -92,8 +97,9 @@ export class ProfileController {
       },
     })
     profile: Profile,
-  ): Promise<void> {
-    return this.profileRepository.updateById(id, profile);
+  ): Promise<Profile> {
+    await this.profileRepository.updateById(id, profile);
+    return this.profileRepository.findById(id);
   }
 
   @put('/profile/{id}')
