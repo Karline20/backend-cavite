@@ -17,6 +17,8 @@ let ResearcherController = exports.ResearcherController = class ResearcherContro
         return this.researcherRepository.count(where);
     }
     async find(filter) {
+        filter = filter !== null && filter !== void 0 ? filter : {};
+        filter.order = ['name ASC'];
         return this.researcherRepository.find(filter);
     }
     async updateAll(rating, where) {

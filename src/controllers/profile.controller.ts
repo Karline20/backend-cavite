@@ -20,8 +20,8 @@ import {ProfileRepository} from '../repositories';
 export class ProfileController {
   constructor(
     @repository(ProfileRepository)
-    public profileRepository : ProfileRepository,
-  ) {}
+    public profileRepository: ProfileRepository,
+  ) { }
 
   @post('/profile')
   @response(200, {
@@ -93,7 +93,7 @@ export class ProfileController {
     })
     profile: Profile,
   ): Promise<void> {
-    await this.profileRepository.updateById(id, profile);
+    return this.profileRepository.updateById(id, profile);
   }
 
   @put('/profile/{id}')
@@ -128,7 +128,7 @@ export class ProfileController {
     @param.path.string('userid') userid: string,
     @param.filter(Profile) filter?: Filter<Profile>,
   ): Promise<Profile | undefined> { // Update the return type to allow undefined
-    const profile = await this.profileRepository.findOne({ where: { userid }, ...filter });
+    const profile = await this.profileRepository.findOne({where: {userid}, ...filter});
     if (profile) {
       return profile; // Return the profile if found
     }
